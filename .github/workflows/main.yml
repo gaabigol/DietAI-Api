@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        #step 1
+      - name: Setup do Node JS
+        uses: actions/setup-node@v4.0.3
+        with:
+          node-version: 20.11.1
+
+        #step 2
+      - name: Autenticação no Docker Hub
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{secrets.DOCKERHUB_USERNAME}}
+          password: ${{secrets.DOCKERHUB_PASSWORD}}
+
+        #step 3
+      - name: Construção de Imagem docker
+        uses: docker/build-push-action@v6.7.0
+        with:
+          context: ./
+          file: ./Dockerfile
+          push: true
+          tags: |
+            gbeenard96/dietapiv1:v${{github.run_number}}
